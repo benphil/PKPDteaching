@@ -48,7 +48,8 @@ shinyUI(fluidPage(
                                value = 0.5),
                    numericInput("Comp_factor", "complex elimination compared to mAb [factor]", 1, min = NA, max = NA, step = NA,
                                 width = NULL),
-                   actionButton("startSim", "Start simulation")
+                   actionButton("startSim", "Start Simulation", icon("paper-plane"), 
+                                style="color: #fff; background-color: #FF0000; border-color: #2e6da4")
                    
       ),  
       mainPanel(  

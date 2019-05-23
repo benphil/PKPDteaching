@@ -368,7 +368,7 @@ odes_TurnoverModel_2_inhibition_of_loss <- function (t, A, p) {  # ODE system
   ddtDose_Central = -ReactionFlux1
   ddtDrug_Central =  1/Central*(ReactionFlux1 - ReactionFlux2 - ReactionFlux4)
   ddtDrug_Peripheral = 1/Peripheral*(ReactionFlux4)
-  ddtResponse = kin - kout*(1-(p$Emax_turnover*Drug_Central/(p$EC50 +Drug_Central)))*Response
+  ddtResponse = kin - kout*(1-((p$Emax_turnover/100)*Drug_Central/(p$EC50 +Drug_Central)))*Response
   
   deriva <- list ( c (  ddtDose_Central, ddtDrug_Central, ddtDrug_Peripheral, ddtResponse) )
   
@@ -415,7 +415,7 @@ getAllParametersAndDosing <-function(fromslider){
   #p$keC <- fromslider$keC #1/h
   p$keC <- 0.04
   
-  p$Emax = fromslider$Emax
+  #p$Emax = fromslider$Emax
   p$Emax_turnover = fromslider$Emax_turnover
   
   # p$Central  <- fromslider$Central #in ml/kg
@@ -423,7 +423,8 @@ getAllParametersAndDosing <-function(fromslider){
   #p$Peripheral <- fromslider$Peripheral
   p$Peripheral <- 100
   
-  p$kcp <- fromslider$kcp
+  #p$kcp <- fromslider$kcp
+  p$kcp <- 0.05
   #p$kpc <- fromslider$kpc
   
   p$Rss <- fromslider$Rss
@@ -447,7 +448,7 @@ getAllParametersAndDosing <-function(fromslider){
   washouttime <- 4 #time of dosing time
   
   #build sequences with logarithmically after dosing
-  times      <- seq(from=0, to=1500, by=1500/(500))  # Integration window and stepsize
+  times      <- seq(from=0, to=700, by=700/(1400))  # Integration window and stepsize
  # times      <- c(seq(from=0, to=24, by=0.25), seq(from=24, to=365*24, by=24)) 
   times      <- sort(c(times,dose_times,dose_times+0.1,dose_times+0.2,dose_times+0.3))
   obs_c      <- c(1:2)  # Observation compartments
@@ -570,7 +571,7 @@ getSimulationResults <- function(ParametersAndDosing){
     
   }
          
-    
+ 
   return(toplot)
   
 }
@@ -634,6 +635,8 @@ base_breaks_lin <- function(n = 20){
 makePKplot_plasma <- function(SimulationResults,plot_p){
   
   
+  
+  
   #make a prediction dataframe to show the confidence bands
  # predframe <- data.frame(SimulationResults$PK_plasma$t,lwr=SimulationResults$PK_plasma_LB$ipred,upr=SimulationResults$PK_plasma_UB$ipred)
   predframe_central <- data.frame(x=SimulationResults$PK_plasma$t, y=SimulationResults$PK_plasma$ipred, comp=1)
@@ -666,7 +669,7 @@ makePKplot_plasma <- function(SimulationResults,plot_p){
     theme_bw()+
     theme(axis.title.y = element_text(size = rel(1.5), angle = 90, vjust=2),axis.title.x = element_text(size = rel(1.5), vjust=-0.5),legend.position = c(0.85, 0.98),legend.justification=c(1, 1))
   
-    myplot_step1 <- myplot_step1 + geom_line(data=predframe_peripheral,aes(x=x, y=y,group=as.factor(comp),color=as.factor(comp),linetype=as.factor(comp)),size=2)
+   # myplot_step1 <- myplot_step1 + geom_line(data=predframe_peripheral,aes(x=x, y=y,group=as.factor(comp),color=as.factor(comp),linetype=as.factor(comp)),size=2)
   
   
   
@@ -699,8 +702,11 @@ makePKplot_plasma <- function(SimulationResults,plot_p){
   
   
 }
+
+
+
 makeEffektplot <- function(SimulationResults,plot_p){
-  
+ 
   
   #make a prediction dataframe to show the confidence bands
   # predframe <- data.frame(SimulationResults$PK_plasma$t,lwr=SimulationResults$PK_plasma_LB$ipred,upr=SimulationResults$PK_plasma_UB$ipred)
@@ -709,7 +715,7 @@ makeEffektplot <- function(SimulationResults,plot_p){
   #build the plot
   
   xlabel <- "Time in hours"
-  ylabel <- "effect"
+  ylabel <- "Biomarker"
   
   
   # myplot_step1 <- ggplot(predframe_central,na.rm=TRUE)+
@@ -819,8 +825,8 @@ addEffectdataToplot_effect <- function(myplot_step1,Datasets,input){
   
   if (input$Dataset=="Step 3 - multiple dosing and efficacy"){   
     myplot_step4 <- myplot_step3+
-      annotate("rect", xmin=-Inf, xmax=Inf, ymin=47, ymax=52, alpha=0.2, fill="green")+
-      annotate("rect", xmin=-Inf, xmax=Inf, ymin=52, ymax=Inf, alpha=0.2, fill="red")
+      annotate("rect", xmin=-Inf, xmax=Inf, ymin=45, ymax=50, alpha=0.2, fill="green")+
+      annotate("rect", xmin=-Inf, xmax=Inf, ymin=50, ymax=Inf, alpha=0.2, fill="red")
     coord_cartesian(ylim = c(0,60))
   }else{
     myplot_step4 <- myplot_step3

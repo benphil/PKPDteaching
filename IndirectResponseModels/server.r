@@ -6,7 +6,8 @@ source("theheartoftheall.R")
 shinyServer(function(input, output, session) {
   
 
-  getAllSimulationResults <- reactive({
+  getAllSimulationResults <- eventReactive({input$startSim 
+    session$clientData},{
     
     ParametersAndDosing     <- getAllParametersAndDosing(input)
     SimulationResults       <- getSimulationResults(ParametersAndDosing)
@@ -15,14 +16,6 @@ shinyServer(function(input, output, session) {
     return(SimulationResults)
   })
   
-  getAllSimulationResults_turnover <- reactive({
-
-    ParametersAndDosing     <- getAllParametersAndDosing(input)
-    SimulationResults       <- getSimulationResultsTurnover(ParametersAndDosing)
-    # SimulationResults       <- convertUnits(SimulationResults,ParametersAndDosing$p)
-
-    return(SimulationResults)
-  })
   
   getAllPlotParameters <- reactive({
     plot_p                  <- getPlotParameters(input)
@@ -36,7 +29,7 @@ shinyServer(function(input, output, session) {
   })
 
   output$pk_plot_plasma <- renderPlot({ 
-    
+   
     SimulationResults <- getAllSimulationResults()
     
     plot_p            <- getAllPlotParameters()
